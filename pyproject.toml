@@ -1,0 +1,64 @@
+[project]
+name = "youtube-summary"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "python-dotenv>=1.2.3",
+    "tyro>=1.0.16",
+    "webvtt-python>=0.2.0",
+    "youtube-transcript-api>=1.2.4",
+]
+
+[project.scripts]
+youtube-summary = "youtube_summary:main"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.39.10",
+    "black>=26.5.1",
+    "prek>=0.4.14",
+    "pytest>=9.1.1",
+    "ruff>=0.16.4",
+]
+
+[tool.uv]
+cache-dir = ".uv-cache"
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+
+[tool.pytest]
+addopts = ["-ra", "-q"]
+minversion = "9.0"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["typings"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B", "I"]
+
+# 2. Avoid enforcing line-length violations (`E501`)
+ignore = ["E501"]
+
+# 3. Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+
+# 4. Ignore `E402` (import violations) in all `__init__.py` files, and in
+# selected subdirectories.
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+[tool.ruff.format]
+# 5. Use double quotes in `ruff format`.
+quote-style = "double"
