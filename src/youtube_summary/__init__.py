@@ -119,7 +119,7 @@ def get_info(id: str) -> VideoDetails:
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore[reportArgumentType]
         info = ydl.extract_info(constructed_url, download=False)
         chapters: list[str] = []
-        if "chapters" in info:
+        if "chapters" in info and info["chapters"]:
             raw_chapters = cast(list[dict[str, str | int]], info["chapters"])
             for chapter in raw_chapters:
                 if "title" in chapter:
