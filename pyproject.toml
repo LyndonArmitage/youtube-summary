@@ -11,6 +11,7 @@ dependencies = [
     "tyro>=1.0.16",
     "webvtt-python>=0.2.0",
     "youtube-transcript-api>=1.2.4",
+    "yt-dlp>=2026.8.19",
 ]
 
 [project.scripts]

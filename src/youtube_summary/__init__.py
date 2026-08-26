@@ -5,6 +5,7 @@ from typing import cast
 
 import mdformat
 import tyro
+import yt_dlp
 from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.responses import ResponseInputParam
@@ -47,6 +48,13 @@ class Args:
     """
 
 
+@dataclass
+class VideoDetails:
+    title: str
+    channel: str
+    chapters: list[str]
+
+
 def main() -> int:
     args: Args = tyro.cli(Args)  # pyright: ignore[reportAny]
     _ = load_dotenv()
@@ -86,9 +94,11 @@ def main() -> int:
         print("No transcript text.")
         return 1
 
+    details = get_info(extracted_id)
+
     # Send the transcript for parsing to AI model
     try:
-        summary = get_summary(raw_text, args.extra_prompt)
+        summary = get_summary(raw_text, args.extra_prompt, details)
     except Exception as e:
         print(f"Failed to get summary for {extracted_id}: {e}", file=sys.stderr)
         return 1
@@ -97,6 +107,27 @@ def main() -> int:
     if args.save_markdown is not None:
         save_markdown(args.save_markdown, summary)
     return 0
+
+
+def get_info(id: str) -> VideoDetails:
+    constructed_url = f"https://www.youtube.com/watch?v={id}"
+    ydl_opts = {
+        "skip_download": True,
+        "quiet": True,
+        "no_warnings": True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:  # pyright: ignore[reportArgumentType]
+        info = ydl.extract_info(constructed_url, download=False)
+        chapters: list[str] = []
+        if "chapters" in info:
+            raw_chapters = cast(list[dict[str, str | int]], info["chapters"])
+            for chapter in raw_chapters:
+                if "title" in chapter:
+                    chapter_title: str = cast(str, chapter["title"])
+                    chapters.append(chapter_title)
+        title: str = cast(str, info["title"]) if "title" in info else "Unknown"
+        channel: str = cast(str, info["channel"]) if "channel" in info else "Unknown"
+        return VideoDetails(title=title, channel=channel, chapters=chapters)
 
 
 def save_transcript(path: str, transcript_text: str) -> None:
@@ -122,9 +153,9 @@ def convert_transcript(transcript: FetchedTranscript) -> str:
     return joined
 
 
-def get_summary(raw_text: str, extra_prompt: str | None = None) -> str:
+def get_summary(raw_text: str, extra_prompt: str | None, details: VideoDetails) -> str:
     client = OpenAI()
-    summary_instructions = get_summary_instructions(raw_text, extra_prompt)
+    summary_instructions = get_summary_instructions(raw_text, extra_prompt, details)
     inputs: ResponseInputParam = []
 
     if extra_prompt:
@@ -154,10 +185,19 @@ def get_summary(raw_text: str, extra_prompt: str | None = None) -> str:
     return summary
 
 
-def get_summary_instructions(_raw_text: str, extra_prompt: str | None) -> str:
-    instructions = "Summarise the following transcript from a YouTube video."
+def get_summary_instructions(
+    _raw_text: str, extra_prompt: str | None, details: VideoDetails
+) -> str:
+    instructions = (
+        "Summarise the following transcript from a YouTube video "
+        f'with the title: "{details.title}" from the channel "{details.channel}"'
+    )
+    if len(details.chapters) > 1:
+        instructions += "\nIt has the following chapter titles:\n"
+        for title in details.chapters:
+            instructions += f"- {title}\n"
     if extra_prompt is not None and len(extra_prompt) > 0:
-        instructions += "\nYou will be provided some extra context/instructions."
+        instructions += "\n\nYou will be provided some extra context/instructions."
     return instructions
 
 
