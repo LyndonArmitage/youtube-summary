@@ -47,6 +47,11 @@ class Args:
     Optional path to save summary to as a markdown
     """
 
+    openai_api_key: str | None = None
+    """
+    Optional OpenAI API Key that will be used instead of the environment key
+    """
+
 
 @dataclass
 class VideoDetails:
@@ -98,7 +103,12 @@ def main() -> int:
 
     # Send the transcript for parsing to AI model
     try:
-        summary = get_summary(raw_text, args.extra_prompt, details)
+        client = (
+            OpenAI(api_key=args.openai_api_key)
+            if args.openai_api_key is not None
+            else OpenAI()
+        )
+        summary = get_summary(client, raw_text, args.extra_prompt, details)
     except Exception as e:
         print(f"Failed to get summary for {extracted_id}: {e}", file=sys.stderr)
         return 1
@@ -153,8 +163,9 @@ def convert_transcript(transcript: FetchedTranscript) -> str:
     return joined
 
 
-def get_summary(raw_text: str, extra_prompt: str | None, details: VideoDetails) -> str:
-    client = OpenAI()
+def get_summary(
+    client: OpenAI, raw_text: str, extra_prompt: str | None, details: VideoDetails
+) -> str:
     summary_instructions = get_summary_instructions(raw_text, extra_prompt, details)
     inputs: ResponseInputParam = []
 
