@@ -15,3 +15,13 @@ The `docs/` folder contains various details on development.
 
 In short this project is written for Python 3.13+ and uses the `uv` package
 manager and environment for running various commands.
+
+## Local Use
+
+For now I am installing this locally with:
+
+```sh
+uv tool install --editable /home/lyndon/repos/youtube-summary
+```
+
+Where that path is the path to this repository.
