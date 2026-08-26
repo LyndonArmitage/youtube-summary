@@ -3,6 +3,7 @@ import sys
 from dataclasses import dataclass
 from typing import cast
 
+import mdformat
 import tyro
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -40,6 +41,11 @@ class Args:
     Optional path to save transcript to
     """
 
+    save_markdown: str | None = None
+    """
+    Optional path to save summary to as a markdown
+    """
+
 
 def main() -> int:
     args: Args = tyro.cli(Args)  # pyright: ignore[reportAny]
@@ -73,6 +79,9 @@ def main() -> int:
     # Take the fetched transcript and turn it into plain text
     raw_text = convert_transcript(fetched)
 
+    if args.save_transcript is not None:
+        save_transcript(args.save_transcript, raw_text)
+
     if not raw_text:
         print("No transcript text.")
         return 1
@@ -85,7 +94,22 @@ def main() -> int:
         return 1
 
     print(summary)
+    if args.save_markdown is not None:
+        save_markdown(args.save_markdown, summary)
     return 0
+
+
+def save_transcript(path: str, transcript_text: str) -> None:
+    with open(path, "w", encoding="utf-8") as w:
+        _ = w.write(transcript_text)
+
+
+def save_markdown(path: str, summary: str) -> None:
+    with open(path, "w", encoding="utf-8") as w:
+        formatted: str = mdformat.text(  # pyright: ignore[reportUnknownMemberType]
+            summary, options={"wrap": 79}
+        )
+        _ = w.write(formatted)
 
 
 def convert_transcript(transcript: FetchedTranscript) -> str:
@@ -180,5 +204,9 @@ def parse_to_id(url: str, unescape: bool = False) -> str | None:
 
 
 if __name__ == "__main__":
-    return_code = main()
+    try:
+        return_code = main()
+    except Exception as e:
+        print(f"Unhandled exception: {e}", file=sys.stderr)
+        return_code = 1
     sys.exit(return_code)
