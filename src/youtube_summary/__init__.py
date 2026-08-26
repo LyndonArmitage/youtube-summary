@@ -106,10 +106,14 @@ def save_transcript(path: str, transcript_text: str) -> None:
 
 def save_markdown(path: str, summary: str) -> None:
     with open(path, "w", encoding="utf-8") as w:
-        formatted: str = mdformat.text(  # pyright: ignore[reportUnknownMemberType]
-            summary, options={"wrap": 79}
-        )
-        _ = w.write(formatted)
+        _ = w.write(summary)
+
+
+def format_text(text: str) -> str:
+    formatted: str = mdformat.text(  # pyright: ignore[reportUnknownMemberType]
+        text, options={"wrap": 79, "number": True}
+    )
+    return formatted
 
 
 def convert_transcript(transcript: FetchedTranscript) -> str:
@@ -146,6 +150,7 @@ def get_summary(raw_text: str, extra_prompt: str | None = None) -> str:
         input=inputs,
     )
     summary = response.output_text.strip()
+    summary = format_text(summary)
     return summary
 
 
