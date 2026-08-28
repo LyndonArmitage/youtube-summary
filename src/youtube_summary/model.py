@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from datetime import date
+from typing import Protocol
+
+YouTubeID = str
 
 
 @dataclass
@@ -57,6 +60,8 @@ class VideoDetails:
     Metadata related to the video
     """
 
+    id: YouTubeID
+    """YouTube ID"""
     title: str
     """Title of the video"""
     channel: str
@@ -67,3 +72,28 @@ class VideoDetails:
     """Duration of the video in seconds"""
     upload_date: date | None
     """The date the video was uploaded"""
+
+
+class ProvidesVideoDetails(Protocol):
+
+    def get_video_details(self, id: YouTubeID) -> VideoDetails:
+        """Get video details from a YouTube ID"""
+        ...
+
+
+class TranscriptProvider(Protocol):
+
+    def get_transcript(
+        self, id: YouTubeID, language: str, ignore_generated: bool
+    ) -> str | None:
+        """Get a transcript for the given ID"""
+        ...
+
+
+class SummaryProvider(Protocol):
+
+    def generate_summary(
+        self, metadata: VideoDetails, transcript: str, extra_prompt: str | None
+    ) -> str:
+        """Generate a summary using the metadata and transcript"""
+        ...
