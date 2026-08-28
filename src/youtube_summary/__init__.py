@@ -23,7 +23,7 @@ class Args:
     """The YouTube URL or ID to summarise"""
 
     lang: str = "en"
-    """The language to use, default to en"""
+    """The language to use for transcripts, default to en"""
 
     extra_prompt: str | None = None
     """
@@ -35,6 +35,7 @@ class Args:
     """
     Whether to ignore generated captions or not.
     If you ignore such, and no other captions are available, summary will fail.
+    Normally provided captions are used over generated ones.
     """
 
     save_transcript: str | None = None
@@ -50,6 +51,11 @@ class Args:
     openai_api_key: str | None = None
     """
     Optional OpenAI API Key that will be used instead of the environment key
+    """
+
+    model: str = "gpt-5.6-luna"
+    """
+    The LLM model to use for summaries
     """
 
 
@@ -108,7 +114,7 @@ def main() -> int:
             if args.openai_api_key is not None
             else OpenAI()
         )
-        summary = get_summary(client, raw_text, args.extra_prompt, details)
+        summary = get_summary(client, args.model, raw_text, args.extra_prompt, details)
     except Exception as e:
         print(f"Failed to get summary for {extracted_id}: {e}", file=sys.stderr)
         return 1
@@ -164,7 +170,11 @@ def convert_transcript(transcript: FetchedTranscript) -> str:
 
 
 def get_summary(
-    client: OpenAI, raw_text: str, extra_prompt: str | None, details: VideoDetails
+    client: OpenAI,
+    raw_text: str,
+    model: str,
+    extra_prompt: str | None,
+    details: VideoDetails,
 ) -> str:
     summary_instructions = get_summary_instructions(raw_text, extra_prompt, details)
     inputs: ResponseInputParam = []
@@ -187,7 +197,7 @@ def get_summary(
     )
 
     response = client.responses.create(
-        model="gpt-5.6-luna",
+        model=model,
         instructions=summary_instructions,
         input=inputs,
     )
