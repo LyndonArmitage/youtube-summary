@@ -1,6 +1,5 @@
 import re
 import sys
-from dataclasses import dataclass
 from datetime import date, datetime
 from typing import cast
 
@@ -16,57 +15,7 @@ from youtube_transcript_api import (
     YouTubeTranscriptApi,
 )
 
-
-@dataclass
-class Args:
-
-    youtube_url: str
-    """The YouTube URL or ID to summarise"""
-
-    lang: str = "en"
-    """The language to use for transcripts, default to en"""
-
-    extra_prompt: str | None = None
-    """
-    An extra prompt to provide the summariser.
-    Helpful if you want to give extra details to help it out.
-    """
-
-    ignore_generated_captions: bool = False
-    """
-    Whether to ignore generated captions or not.
-    If you ignore such, and no other captions are available, summary will fail.
-    Normally provided captions are used over generated ones.
-    """
-
-    save_transcript: str | None = None
-    """
-    Optional path to save transcript to
-    """
-
-    save_markdown: str | None = None
-    """
-    Optional path to save summary to as a markdown
-    """
-
-    openai_api_key: str | None = None
-    """
-    Optional OpenAI API Key that will be used instead of the environment key
-    """
-
-    model: str = "gpt-5.6-luna"
-    """
-    The LLM model to use for summaries
-    """
-
-
-@dataclass
-class VideoDetails:
-    title: str
-    channel: str
-    chapters: list[str]
-    duration_seconds: int
-    upload_date: date | None
+from youtube_summary.model import Args, VideoDetails
 
 
 def main() -> int:
