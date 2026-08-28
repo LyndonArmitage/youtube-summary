@@ -1,6 +1,7 @@
 import re
 import sys
 from dataclasses import dataclass
+from datetime import date, datetime
 from typing import cast
 
 import mdformat
@@ -65,6 +66,7 @@ class VideoDetails:
     channel: str
     chapters: list[str]
     duration_seconds: int
+    upload_date: date | None
 
 
 def main() -> int:
@@ -145,9 +147,25 @@ def get_info(id: str) -> VideoDetails:
         title: str = cast(str, info["title"]) if "title" in info else "Unknown"
         channel: str = cast(str, info["channel"]) if "channel" in info else "Unknown"
         duration: int = cast(int, info["duration"]) if "duration" in info else 0
+        upload_date: date | None = None
+        if "upload_date" in info and info["upload_date"]:
+            upload_date = parse_date(cast(str, info["upload_date"]))
         return VideoDetails(
-            title=title, channel=channel, chapters=chapters, duration_seconds=duration
+            title=title,
+            channel=channel,
+            chapters=chapters,
+            duration_seconds=duration,
+            upload_date=upload_date,
         )
+
+
+def parse_date(date_string: str) -> date | None:
+    try:
+        found_date = datetime.strptime(date_string, "%Y%m%d").date()
+    except Exception:
+        print(f"Could not parse upload_date={date_string}", file=sys.stderr)
+        return None
+    return found_date
 
 
 def save_transcript(path: str, transcript_text: str) -> None:
@@ -216,8 +234,11 @@ def get_summary_instructions(
     instructions = (
         "Summarise the following transcript from a YouTube video "
         f'with the title: "{details.title}" from the channel "{details.channel}".'
-        f"It is {details.duration_seconds} seconds long."
+        f" It is {details.duration_seconds} seconds long."
     )
+    if details.upload_date is not None:
+        formatted = details.upload_date.strftime("%d %b %Y")
+        instructions += f" It was uploaded on {formatted}."
     if len(details.chapters) > 1:
         instructions += "\nIt has the following chapter titles:\n"
         for title in details.chapters:
