@@ -64,6 +64,7 @@ class VideoDetails:
     title: str
     channel: str
     chapters: list[str]
+    duration_seconds: int
 
 
 def main() -> int:
@@ -143,7 +144,10 @@ def get_info(id: str) -> VideoDetails:
                     chapters.append(chapter_title)
         title: str = cast(str, info["title"]) if "title" in info else "Unknown"
         channel: str = cast(str, info["channel"]) if "channel" in info else "Unknown"
-        return VideoDetails(title=title, channel=channel, chapters=chapters)
+        duration: int = cast(int, info["duration"]) if "duration" in info else 0
+        return VideoDetails(
+            title=title, channel=channel, chapters=chapters, duration_seconds=duration
+        )
 
 
 def save_transcript(path: str, transcript_text: str) -> None:
@@ -211,7 +215,8 @@ def get_summary_instructions(
 ) -> str:
     instructions = (
         "Summarise the following transcript from a YouTube video "
-        f'with the title: "{details.title}" from the channel "{details.channel}"'
+        f'with the title: "{details.title}" from the channel "{details.channel}".'
+        f"It is {details.duration_seconds} seconds long."
     )
     if len(details.chapters) > 1:
         instructions += "\nIt has the following chapter titles:\n"
