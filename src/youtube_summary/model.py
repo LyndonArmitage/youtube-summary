@@ -73,6 +73,11 @@ class VideoDetails:
     upload_date: date | None
     """The date the video was uploaded"""
 
+    @property
+    def video_url(self) -> str:
+        """The video ID embedded in a URL"""
+        return f"https://www.youtube.com/watch?v={self.id}"
+
 
 class ProvidesVideoDetails(Protocol):
 

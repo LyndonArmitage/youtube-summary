@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import mdformat
 from openai import OpenAI
 from openai.types.responses import ResponseInputParam
@@ -46,7 +48,7 @@ class OpenAISummariser:
         )
         summary = response.output_text.strip()
         summary = _format_text(summary)
-        return summary
+        return _get_header(metadata) + summary
 
 
 def _get_summary_instructions(
@@ -67,6 +69,17 @@ def _get_summary_instructions(
     if extra_prompt is not None and len(extra_prompt) > 0:
         instructions += "\n\nYou will be provided some extra context/instructions."
     return instructions
+
+
+def _get_header(metadata: VideoDetails) -> str:
+    duration = str(timedelta(seconds=metadata.duration_seconds))
+    return f"""---
+url: {metadata.video_url}
+title: {metadata.title}
+channel: {metadata.channel}
+duration: "{duration}"
+---\n
+"""
 
 
 def _format_text(text: str) -> str:
