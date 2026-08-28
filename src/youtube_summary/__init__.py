@@ -117,7 +117,7 @@ def main() -> int:
             if args.openai_api_key is not None
             else OpenAI()
         )
-        summary = get_summary(client, args.model, raw_text, args.extra_prompt, details)
+        summary = get_summary(client, raw_text, args.model, args.extra_prompt, details)
     except Exception as e:
         print(f"Failed to get summary for {extracted_id}: {e}", file=sys.stderr)
         return 1
