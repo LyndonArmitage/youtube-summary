@@ -42,7 +42,9 @@ def main() -> int:
 
     # Send the transcript for parsing to AI model
     try:
-        summariser: SummaryProvider = OpenAISummariser(args.model, args.openai_api_key)
+        summariser: SummaryProvider = OpenAISummariser(
+            args.model, args.openai_api_key, args.extra_tags
+        )
         summary = summariser.generate_summary(details, raw_text, args.extra_prompt)
     except Exception as e:
         print(f"Failed to get summary for {extracted_id}: {e}", file=sys.stderr)

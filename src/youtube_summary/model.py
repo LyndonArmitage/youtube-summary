@@ -53,6 +53,11 @@ class Args:
     The LLM model to use for summaries
     """
 
+    extra_tags: list[str] | None = None
+    """
+    Extra tags to add to the output
+    """
+
 
 @dataclass
 class VideoDetails:

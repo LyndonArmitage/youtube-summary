@@ -9,11 +9,17 @@ from youtube_summary.model import VideoDetails
 
 class OpenAISummariser:
 
-    def __init__(self, model: str, api_key: str | None = None) -> None:
+    def __init__(
+        self,
+        model: str,
+        api_key: str | None = None,
+        extra_tags: list[str] | None = None,
+    ) -> None:
         self.model: str = model
         self.client: OpenAI = (
             OpenAI(api_key=api_key) if api_key is not None else OpenAI()
         )
+        self.extra_tags: list[str] = extra_tags.copy() if extra_tags is not None else []
 
     def generate_summary(
         self, metadata: VideoDetails, transcript: str, extra_prompt: str | None
@@ -48,7 +54,7 @@ class OpenAISummariser:
         )
         summary = response.output_text.strip()
         summary = _format_text(summary)
-        return _get_header(metadata) + summary
+        return _get_header(metadata, self.extra_tags) + summary
 
 
 def _get_summary_instructions(
@@ -71,15 +77,22 @@ def _get_summary_instructions(
     return instructions
 
 
-def _get_header(metadata: VideoDetails) -> str:
+def _get_header(metadata: VideoDetails, tags: list[str]) -> str:
     duration = str(timedelta(seconds=metadata.duration_seconds))
-    return f"""---
-url: {metadata.video_url}
-title: {metadata.title}
-channel: {metadata.channel}
-duration: "{duration}"
----\n
-"""
+    values: dict[str, str] = {
+        "url": metadata.video_url,
+        "title": metadata.title,
+        "channel": metadata.channel,
+        "duration": f"{duration}",
+    }
+    if len(tags) > 0:
+        tags_combined: str = ", ".join(tags)
+        values["tags"] = f"[{tags_combined}]"
+
+    rows: list[str] = [f"{k}: {v}" for k, v in values.items()]
+    all_vars = "\n".join(rows)
+
+    return f"---\n{all_vars}\n---\n"
 
 
 def _format_text(text: str) -> str:
