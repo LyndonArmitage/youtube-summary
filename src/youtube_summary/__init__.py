@@ -1,9 +1,11 @@
 import re
 import sys
+from string import Template
 from typing import cast
 
 import tyro
 from dotenv import load_dotenv
+from pathvalidate import sanitize_filepath
 
 from youtube_summary.metadata import YTDLPMetadataFetcher
 from youtube_summary.model import (
@@ -34,11 +36,14 @@ def main() -> int:
     if raw_text is None:
         return 1
 
-    if args.save_transcript is not None:
-        save_transcript(args.save_transcript, raw_text)
-
     provider: ProvidesVideoDetails = YTDLPMetadataFetcher()
     details: VideoDetails = provider.get_video_details(extracted_id)
+
+    if args.save_transcript is not None:
+        transcript_path = sanitize_filepath(
+            template_string(args.save_transcript, details)
+        )
+        save_transcript(transcript_path, raw_text)
 
     # Send the transcript for parsing to AI model
     try:
@@ -52,7 +57,8 @@ def main() -> int:
 
     print(summary)
     if args.save_markdown is not None:
-        save_markdown(args.save_markdown, summary)
+        markdown_path = sanitize_filepath(template_string(args.save_markdown, details))
+        save_markdown(markdown_path, summary)
     return 0
 
 
@@ -64,6 +70,17 @@ def save_transcript(path: str, transcript_text: str) -> None:
 def save_markdown(path: str, summary: str) -> None:
     with open(path, "w", encoding="utf-8") as w:
         _ = w.write(summary)
+
+
+def template_string(string: str, metadata: VideoDetails) -> str:
+    template = Template(string)
+    mapping: dict[str, str] = {
+        "id": metadata.id,
+        "youtube_id": metadata.id,
+        "channel": metadata.channel,
+        "title": metadata.title,
+    }
+    return template.safe_substitute(mapping)
 
 
 VIDEO_ID = r"[A-Za-z0-9_-]{11}"

@@ -434,6 +434,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pathvalidate"
+version = "3.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fa/2a/52a8da6fe965dea6192eb716b357558e103aea0a1e9a8352ad575a8406ca/pathvalidate-3.3.1.tar.gz", hash = "sha256:b18c07212bfead624345bb8e1d6141cdcf15a39736994ea0b94035ad2b1ba177", size = 63262, upload-time = "2025-06-15T09:07:20.736Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/70/875f4a23bfc4731703a5835487d0d2fb999031bd415e7d17c0ae615c18b7/pathvalidate-3.3.1-py3-none-any.whl", hash = "sha256:5263baab691f8e1af96092fa5137ee17df5bdfbd6cff1fcac4d6ef4bc2e1735f", size = 24305, upload-time = "2025-06-15T09:07:19.117Z" },
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.11.4"
 source = { registry = "https://pypi.org/simple" }
@@ -734,6 +743,7 @@ source = { editable = "." }
 dependencies = [
     { name = "mdformat" },
     { name = "openai" },
+    { name = "pathvalidate" },
     { name = "python-dotenv" },
     { name = "tyro" },
     { name = "webvtt-python" },
@@ -754,6 +764,7 @@ dev = [
 requires-dist = [
     { name = "mdformat", specifier = ">=1.0.0" },
     { name = "openai", specifier = ">=3.3.1" },
+    { name = "pathvalidate", specifier = ">=3.3.1" },
     { name = "python-dotenv", specifier = ">=1.2.3" },
     { name = "tyro", specifier = ">=1.0.16" },
     { name = "webvtt-python", specifier = ">=0.2.0" },

@@ -35,12 +35,20 @@ class Args:
 
     save_transcript: str | None = None
     """
-    Optional path to save transcript to
+    Optional path to save transcript to.
+
+    This supports substitutions like ${id} for the video ID. You'll need to
+    either use single quotes like '${id}.txt' or escape the $ sign in double
+    quotes for most shells.
     """
 
     save_markdown: str | None = None
     """
     Optional path to save summary to as a markdown
+
+    This supports substitutions like ${id} for the video ID. You'll need to
+    either use single quotes like '${id}.md' or escape the $ sign in double
+    quotes for most shells.
     """
 
     openai_api_key: str | None = None
