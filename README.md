@@ -9,6 +9,9 @@ as a simple local tool that acts as glue between a few Python dependencies like
 `yt-dlp`, `webvtt-python`, and `openai`. Essentially, it is supposed to provide
 a local application that can replace an online summariser tool.
 
+I've written a short post about this on my blog
+[lyndon.codes](https://lyndon.codes/2026/09/14/creating-a-simple-youtube-summariser/)
+
 ## Development
 
 The `docs/` folder contains various details on development.
