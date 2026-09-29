@@ -30,6 +30,10 @@ from youtube_summary import parse_to_id
             "https://m.youtube.com/watch?v=A5l5GDwjymE",
             "A5l5GDwjymE",
         ),
+        (
+            r"https:\/\/www.youtube.com\/watch\?v\=A5l5GDwjymE",
+            "A5l5GDwjymE",
+        ),
     ],
 )
 def test_parse_to_id_returns_video_id(url: str, expected: str) -> None:
