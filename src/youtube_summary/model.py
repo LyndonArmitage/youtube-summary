@@ -56,7 +56,7 @@ class Args:
     Optional OpenAI API Key that will be used instead of the environment key
     """
 
-    model: str = "gpt-5.6-luna"
+    model: str = "gpt-6-luna"
     """
     The LLM model to use for summaries
     """
