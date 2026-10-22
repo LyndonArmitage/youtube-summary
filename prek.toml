@@ -37,7 +37,7 @@ id = "check-executables-have-shebangs"
 
 [[repos]]
 repo = "https://github.com/psf/black"
-rev = "26.5.1"
+rev = "26.10.1"
 
 [[repos.hooks]]
 id = "black"
@@ -45,14 +45,14 @@ language_version = "python3.13"
 
 [[repos]]
 repo = "https://github.com/astral-sh/ruff-pre-commit"
-rev = "v0.16.8"
+rev = "v0.17.1"
 
 [[repos.hooks]]
 id = "ruff-check"
 
 [[repos]]
 repo = "https://github.com/DetachHead/basedpyright-prek-mirror"
-rev = "1.40.1"
+rev = "1.40.2"
 
 [[repos.hooks]]
 id = "basedpyright"
